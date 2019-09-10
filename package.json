@@ -6,7 +6,7 @@
     "dev": "PORT=3001 sapper dev",
     "build": "sapper build --legacy",
     "export": "sapper export --legacy",
-    "start": "node __sapper__/build",
+    "start": "PORT=3001 node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
     "test": "run-p --race dev cy:run"
@@ -18,11 +18,10 @@
     "apollo-link-error": "^1.1.12",
     "apollo-link-http": "^1.5.16",
     "compression": "^1.7.1",
-    "express": "^4.17.1",
-    "express-graphql": "^0.9.0",
     "graphql": "^14.5.4",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.5",
+    "polka": "next",
     "sirv": "^0.4.0"
   },
   "devDependencies": {
