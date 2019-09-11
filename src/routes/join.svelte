@@ -50,7 +50,7 @@
           if (networkError) console.log(`[Network error]: ${networkError}`);
         }),
         new HttpLink({
-          uri: 'http://localhost:3000/unauthenticated-graphql',
+          uri: 'http://localhost:3000/graphql',
           fetch
         }),
       ]),
@@ -64,8 +64,8 @@
   let password;
 
   let saving = false;
-  $: createUserMutation = gql`mutation {
-        createUser(input: {
+  $: createUserAccountMutation = gql`mutation {
+        createUserAccount(input: {
           username: "${username}",
           phone: "${phone}",
           email: "${email}",
@@ -80,7 +80,7 @@
     saving = true;
     try {
       const result = await client.mutate({
-        mutation: createUserMutation
+        mutation: createUserAccountMutation
       });
       console.log(result);
       // TODO redirect to login
