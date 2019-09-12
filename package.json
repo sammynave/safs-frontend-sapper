@@ -12,15 +12,7 @@
     "test": "run-p --race dev cy:run"
   },
   "dependencies": {
-    "apollo-cache-inmemory": "^1.6.3",
-    "apollo-client": "^2.6.4",
-    "apollo-link": "^1.2.13",
-    "apollo-link-error": "^1.1.12",
-    "apollo-link-http": "^1.5.16",
     "compression": "^1.7.1",
-    "graphql": "^14.5.4",
-    "graphql-tag": "^2.10.1",
-    "graphql-tools": "^4.0.5",
     "polka": "next",
     "sirv": "^0.4.0"
   },
