@@ -37,7 +37,7 @@
     bottom: -1px;
   }
 
-  a {
+  a, span {
     text-decoration: none;
     padding: 1em 0.5em;
     display: block;
@@ -45,21 +45,28 @@
 </style>
 
 <script>
-  import { stores } from '@sapper/app';
+  import { stores, goto } from '@sapper/app';
+  import { logout } from '../api/current-user';
 
   export let segment;
   const { session } = stores();
+
+  function handleLogout() {
+    logout(session);
+    return goto('/join');
+  }
 </script>
 
 <nav>
   <ul>
-    {#if session.token}
-      <li><a class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
-      <li><a class='{segment === "about" ? "selected" : ""}' href='about'>about</a></li>
+    {#if $session.signedIn}
+      <li><a rel=prefetch class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
+      <li><a rel=prefetch class='{segment === "users" ? "selected" : ""}' href='users'>users</a></li>
       <li><a rel=prefetch class='{segment === "blog" ? "selected" : ""}' href='blog'>blog</a></li>
+      <li><span role="button" on:click={handleLogout}>logout</span></li>
     {:else}
-      <li><a class='{segment === "join" ? "selected" : ""}' href='join'>join</a></li>
-      <li><a class='{segment === "login" ? "selected" : ""}' href='login'>login</a></li>
+      <li><a rel=prefetch class='{segment === "join" ? "selected" : ""}' href='join'>join</a></li>
+      <li><a rel=prefetch class='{segment === "login" ? "selected" : ""}' href='login'>login</a></li>
     {/if}
   </ul>
 </nav>

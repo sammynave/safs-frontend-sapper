@@ -1,3 +1,11 @@
+<script context="module">
+  export async function preload(page, session) {
+    if(session.signedIn) {
+      return this.redirect(302, '/');
+    }
+  }
+</script>
+
 <style>
   form {
     max-width: 10em;
@@ -23,30 +31,37 @@
 {/if}
 
 <script>
-  let email;
-  let password;
+  import { stores, goto } from '@sapper/app';
+  import { login } from '../api/current-user';
+
+  const { session } = stores();
+
+  let email = '';
+  let password = '';
 
   let saving = false;
 
-function submit() {
-  saving = true;
-  fetch('http://localhost:3000/authenticate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email,
-      password
-    })
-  }).then(function(response) {
-      return response.json()
-    }).then(function(json) {
-      console.log('parsed json', json)
-    }).catch(function(ex) {
-      console.log('parsing failed', ex)
-    }).finally(function() {
+  let errorMessage = '';
+  let errors = [];
+
+  function resetForm() {
+    email = '';
+    password = '';
+  }
+
+  async function submit() {
+    saving = true;
+    errorMessage = '';
+    errors = [];
+    try {
+      await login(session, { password, email });
+      resetForm();
+      return goto('/');
+    } catch (e) {
+      console.log('error in routes/login.svelte');
+      console.log(e);
+    } finally {
       saving = false;
-    })
-}
+    }
+  }
 </script>

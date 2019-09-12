@@ -1,3 +1,11 @@
+<script context="module">
+  export async function preload(page, session) {
+    if(session.signedIn) {
+      return this.redirect(302, '/');
+    }
+  }
+</script>
+
 <style>
   form {
     max-width: 10em;
@@ -24,42 +32,39 @@
   </form>
 {/if}
 
+<button on:click={gotoIndex}>index</button>
 <script>
-  let username;
-  let phone;
-  let email;
-  let password;
+  import { stores, goto } from '@sapper/app';
+  import { signup } from '../api/current-user';
+
+  const { session } = stores();
+
+  let username = '';
+  let phone = '';
+  let email = '';
+  let password = '';
   let saving = false;
 
-  $: createUserAccountMutation = `mutation {
-        createUserAccount(input: {
-          username: "${username}",
-          phone: "${phone}",
-          email: "${email}",
-          password: "${password}"
-        }) {
-          user { id username }
-          errors
-        }
-    }`;
+  function resetForm() {
+    username = "",
+    phone = "",
+    email = "",
+    password = ""
+  }
+
+  function gotoIndex(){
+    return goto('/');
+  }
 
   async function submit() {
     saving = true;
+
     try {
-      const response = await fetch("http://localhost:3000/graphql", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          query: createUserAccountMutation
-        })
-      });
-      const result = await response.json();
-      const { data } = result
-    } catch (ex) {
-      console.log('parsing failed', ex)
+      await signup(session, { email, password, phone, username });
+      resetForm();
+      return goto('/');
+    } catch (e) {
+      throw e;
     } finally {
       saving = false;
     }
