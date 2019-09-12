@@ -1,6 +1,3 @@
-<script context="module">
-
-</script>
 <style>
   form {
     max-width: 10em;
@@ -28,43 +25,13 @@
 {/if}
 
 <script>
-  import ApolloClient from 'apollo-client';
-  import { InMemoryCache } from 'apollo-cache-inmemory';
-  import { HttpLink } from 'apollo-link-http';
-  import { onError } from 'apollo-link-error';
-  import { ApolloLink } from 'apollo-link';
-  import gql from 'graphql-tag';
-  import { onMount } from 'svelte';
-
-  let client;
-  onMount(() => {
-    client = new ApolloClient({
-      link: ApolloLink.from([
-        onError(({ graphQLErrors, networkError }) => {
-          if (graphQLErrors)
-            graphQLErrors.forEach(({ message, locations, path }) =>
-              console.log(
-                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-              ),
-            );
-          if (networkError) console.log(`[Network error]: ${networkError}`);
-        }),
-        new HttpLink({
-          uri: 'http://localhost:3000/graphql',
-          fetch
-        }),
-      ]),
-      cache: new InMemoryCache(),
-    });
-  });
-
   let username;
   let phone;
   let email;
   let password;
-
   let saving = false;
-  $: createUserAccountMutation = gql`mutation {
+
+  $: createUserAccountMutation = `mutation {
         createUserAccount(input: {
           username: "${username}",
           phone: "${phone}",
@@ -79,11 +46,18 @@
   async function submit() {
     saving = true;
     try {
-      const result = await client.mutate({
-        mutation: createUserAccountMutation
+      const response = await fetch("http://localhost:3000/graphql", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          query: createUserAccountMutation
+        })
       });
-      console.log(result);
-      // TODO redirect to login
+      const result = await response.json();
+      const { data } = result
     } catch (ex) {
       console.log('parsing failed', ex)
     } finally {
