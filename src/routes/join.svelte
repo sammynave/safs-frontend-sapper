@@ -32,13 +32,17 @@
   </form>
 {/if}
 
-<button on:click={gotoIndex}>index</button>
+{#each errors as error}
+  <div>{error}</div>
+{/each}
+
 <script>
   import { stores, goto } from '@sapper/app';
   import { signup } from '../api/current-user';
 
   const { session } = stores();
 
+  let errors = [];
   let username = '';
   let phone = '';
   let email = '';
@@ -64,6 +68,8 @@
       resetForm();
       return goto('/');
     } catch (e) {
+      const error = JSON.parse(e.message);
+      errors = error.errors && error.errors.length ? error.errors : [error.statusText];
       throw e;
     } finally {
       saving = false;

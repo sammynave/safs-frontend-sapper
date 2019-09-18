@@ -58,8 +58,11 @@
       resetForm();
       return goto('/');
     } catch (e) {
+      const error = JSON.parse(e.message);
+      errors = error.errors && error.errors.length ? error.errors : [error.statusText];
       console.log('error in routes/login.svelte');
       console.log(e);
+      throw(e);
     } finally {
       saving = false;
     }

@@ -62,6 +62,7 @@
     {#if $session.signedIn}
       <li><a rel=prefetch class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
       <li><a rel=prefetch class='{segment === "users" ? "selected" : ""}' href='users'>users</a></li>
+      <li><a rel=prefetch class='{segment === "hang-types" ? "selected" : ""}' href='hang-types'>hang types</a></li>
       <li><a rel=prefetch class='{segment === "blog" ? "selected" : ""}' href='blog'>blog</a></li>
       <li><span role="button" on:click={handleLogout}>logout</span></li>
     {:else}

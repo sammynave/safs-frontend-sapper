@@ -63,11 +63,15 @@ export const signup = async (sessionStore, body) => {
     body: JSON.stringify({ user: body })
   });
 
-  const auth = await response.json();
-
-  if (!response.ok) {
-    return throwError(response.statusText, auth.errors);
+  let responseBody = {};
+  if (response.bodyUsed) {
+    responseBody = await response.json();
   }
 
-  setCurrentUser(sessionStore, { ...auth, signedIn: true });
+  if (!response.ok) {
+    responseBody = await response.json();
+    return throwError(response.statusText, responseBody);
+  }
+
+  setCurrentUser(sessionStore, { ...responseBody, signedIn: true });
 }

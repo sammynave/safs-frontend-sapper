@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
 
-export const count = writable(0);
 export const users = writable([]);
+export const hangTypes = writable([]);
