@@ -12,12 +12,10 @@
 </script>
 
 <svelte:head>
-  <title>Users</title>
+  <title>Hang Types</title>
 </svelte:head>
 
-<h1>Users</h1>
-
-<p>This is the 'users' page. There's not much here.</p>
+<h1>Hang Types</h1>
 
 {#if $hangTypes}
   hang types
@@ -32,9 +30,39 @@
   {/each}
 {/if}
 
+<h2>add hang type</h2>
+<form on:submit|preventDefault={createHangType}>
+  <input type="text" bind:value={name} placeholder="name">
+  <button type="submit">add</button>
+</form>
+
 
 <script>
   export let hangTypes;
+
+  let name = '';
+
+  async function createHangType() {
+    const body = JSON.stringify({
+      query: `mutation {
+        createNewHangType(input: { name: "${name}" }) {
+          hangType {
+            id,
+            name,
+            hangSubscriptions {
+              user { username }
+            }
+          }
+        }
+      }`
+    });
+
+    const result = await query({ fetch, body });
+    const { data: { createNewHangType: { hangType } } } = result;
+    hangTypes.update(x => {
+      return $hangTypes.concat([hangType])
+    });
+  }
 
   async function subscribeTo(hangTypeId) {
     const body = JSON.stringify({
