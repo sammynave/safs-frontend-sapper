@@ -1,12 +1,14 @@
 <script context="module">
   // This set up prevents loading data too often.
   // we preload it once, keep track with count. then
-  // pass a users store around. we could write some 
+  // pass a users store around. we could write some
   // logic around when to refresh this data. for now
   // there's a refresh button
   import { query } from '../api/graphql';
-  import { count, users } from '../stores';
+  import { users } from '../stores';
+  import { writable } from 'svelte/store';
 
+  export const count = writable(0);
   let countValue;
 
   export async function preload() {
