@@ -29,16 +29,18 @@ export const logout = (sessionStore) => {
   clearCurrentUser(sessionStore);
 }
 
+const post = (url, body) => fetch(url, {
+  method: 'POST',
+  mode: 'cors',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(body)
+});
+
 export const login = async (sessionStore, body) => {
-  const response = await fetch(`${API_URL}/authentication.json`, {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ auth: body })
-  });
+  const response = await post(`${API_URL}/authentication.json`, { auth: body });
 
   let responseBody = {};
   if (response.bodyUsed) {
@@ -53,15 +55,7 @@ export const login = async (sessionStore, body) => {
 }
 
 export const signup = async (sessionStore, body) => {
-  const response = await fetch(`${API_URL}/user_signups.json`, {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ user: body })
-  });
+  const response = await post(`${API_URL}/user_signups.json`, { user: body });
 
   let responseBody = {};
   if (response.bodyUsed) {
