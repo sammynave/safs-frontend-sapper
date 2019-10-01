@@ -1,13 +1,30 @@
 <script context="module">
-  import { query } from '../api/graphql';
-  import { hangTypes } from '../stores';
+  import { query } from '../../api/graphql';
+  import { hangTypes, currentUser } from '../../stores';
+
+  const getHangTypes = `
+    {
+      me {
+        id,
+        username
+      }
+      hangTypes {
+        id,
+        name,
+        hangSubscriptions {
+          user { username }
+        }
+    } }
+  `;
+
 
   export async function preload() {
-    const body = JSON.stringify({ query: `{ hangTypes { id, name, hangSubscriptions
-{ user { username } } } }` });
+    const body = JSON.stringify({ query: getHangTypes });
     const result = await query({ fetch: this.fetch, body });
+
     hangTypes.set(result.data.hangTypes);
-    return { hangTypes };
+    currentUser.set(result.data.me);
+    return { hangTypes, currentUser };
   }
 </script>
 
@@ -21,7 +38,11 @@
   hang types
   {#each $hangTypes as hangType}
     <div>{hangType.name}
-      <button on:click={() => subscribeTo(hangType.id)}>subscribe</button>
+      {#if hangType.hangSubscriptions.map(x => x.user.username).includes($currentUser.username)}
+        <button on:click={() => unsubscribeFrom(hangType.id)}>unsubscribe</button>
+      {:else}
+        <button on:click={() => subscribeTo(hangType.id)}>subscribe</button>
+      {/if}
     </div>
 
     {#each hangType.hangSubscriptions as hs}
@@ -36,12 +57,13 @@
   <button type="submit">add</button>
 </form>
 
-
 <script>
   export let hangTypes;
+  export let currentUser;
 
   let name = '';
 
+  $: console.log($currentUser);
   async function createHangType() {
     const body = JSON.stringify({
       query: `mutation {
@@ -81,6 +103,19 @@
 
     const result = await query({ fetch, body });
     const { data: { subscribeToHangType: { hangType } } } = result;
+
+    hangTypes.update(x => {
+      return $hangTypes.map(y => y.id == hangType.id ? hangType : y)
+    });
+  }
+
+  async function unsubscribeFrom(hangTypeId) {
+    const body = JSON.stringify({
+      query: ``
+    });
+
+    const result = await query({ fetch, body });
+    const { data: { unsubscribeFromHangType: { hangType } } } = result;
 
     hangTypes.update(x => {
       return $hangTypes.map(y => y.id == hangType.id ? hangType : y)

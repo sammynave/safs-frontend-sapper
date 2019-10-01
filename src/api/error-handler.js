@@ -1,5 +1,5 @@
 export const NOT_AUTHORIZED = 'Not Authorized';
 
-export const throwError = (statusText, errors) => {
-  throw Error(JSON.stringify({ statusText, errors }));
+export const throwError = ({ text, errors, status }) => {
+  throw Error(JSON.stringify({ text, errors, status }));
 }

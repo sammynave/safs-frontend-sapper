@@ -15,7 +15,11 @@ export const query = async ({ body, fetch }) => {
   const responseBody = await response.json();
 
   if (!response.ok) {
-    return throwError(response, responseBody);
+    return throwError({
+      status: response.status,
+      text: response.statusText,
+      errors: [responseBody.error]
+    });
   }
 
   return responseBody;

@@ -4,14 +4,15 @@
   // pass a users store around. we could write some
   // logic around when to refresh this data. for now
   // there's a refresh button
-  import { query } from '../api/graphql';
-  import { users } from '../stores';
+  import { query } from '../../api/graphql';
+  import { logout } from '../../api/current-user';
+  import { users } from '../../stores';
   import { writable } from 'svelte/store';
 
   export const count = writable(0);
   let countValue;
 
-  export async function preload() {
+  export async function preload(_, session) {
     let unsubscribe = count.subscribe(v => (countValue = v));
     if (countValue > 0) {
       unsubscribe();
@@ -19,9 +20,15 @@
     }
     count.update(n => n + 1);
     const body = JSON.stringify({ query: `{ users { username } }` });
-    const result = await query({ fetch: this.fetch, body });
-    users.set(result.data.users);
-    return { users , count };
+    try {
+      const result = await query({ fetch: this.fetch, body });
+      users.set(result.data.users);
+      return { users, count };
+    } catch (e) {
+      logout(session);
+
+      return this.redirect(302, 'auth/join');
+    }
   }
 </script>
 
@@ -29,20 +36,22 @@
   <title>Users</title>
 </svelte:head>
 
+<h1>what</h1>
 <h1>Users</h1>
 
 <p>This is the 'users' page. There's not much here.</p>
 
-{#if $users}
-  users
-  {#each $users as user}
-    <div>user - {user.username}</div>
-  {/each}
-{/if}
+<div>
+  {#if $users}
+    users
+    {#each $users as user}
+      <div>user - {user.username}</div>
+    {/each}
+  {/if}
 
-{$count}
-<button on:click={handleRefresh}>refresh</button>
-
+  {$count}
+  <button on:click={handleRefresh}>refresh</button>
+</div>
 <script>
   export let count;
   export let users;
