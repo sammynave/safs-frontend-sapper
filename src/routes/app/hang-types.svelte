@@ -63,8 +63,6 @@
 
   let name = '';
 
-  $: console.log($currentUser);
-
   async function createHangType() {
     const body = JSON.stringify({
       query: `mutation createHang($name: String!){
