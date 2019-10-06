@@ -1,11 +1,3 @@
-<script context="module">
-  export async function preload(page, session) {
-    if(session.signedIn) {
-      return this.redirect(302, '/');
-    }
-  }
-</script>
-
 <style>
   form {
     max-width: 10em;
@@ -19,20 +11,24 @@
   }
 </style>
 
-{#if saving}
-  <div>saving</div>
-{:else}
-  <form on:submit|preventDefault={submit}>
-    <div>sign in</div>
-    <input type="email" bind:value={email} placeholder="email"/>
-    <input type="password" bind:value={password} placeholder="password"/>
-    <button type="submit">create</button>
-  </form>
-{/if}
+<main>
+  <h1>sign in</h1>
+  <div>
+    {#if saving}
+      <div>saving</div>
+    {:else}
+      <form on:submit|preventDefault={submit}>
+        <input type="email" bind:value={email} placeholder="email"/>
+        <input type="password" bind:value={password} placeholder="password"/>
+        <button type="submit">create</button>
+      </form>
+    {/if}
+  </div>
+</main>
 
 <script>
   import { stores, goto } from '@sapper/app';
-  import { login } from '../api/current-user';
+  import { login } from '../../api/current-user';
 
   const { session } = stores();
 

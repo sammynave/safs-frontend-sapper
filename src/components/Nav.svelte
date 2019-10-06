@@ -53,21 +53,20 @@
 
   function handleLogout() {
     logout(session);
-    return goto('/join');
+    return goto('/auth/join');
   }
 </script>
 
 <nav>
   <ul>
+    <li><a rel=prefetch class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
     {#if $session.signedIn}
-      <li><a rel=prefetch class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
-      <li><a rel=prefetch class='{segment === "users" ? "selected" : ""}' href='users'>users</a></li>
-      <li><a rel=prefetch class='{segment === "hang-types" ? "selected" : ""}' href='hang-types'>hang types</a></li>
-      <li><a rel=prefetch class='{segment === "blog" ? "selected" : ""}' href='blog'>blog</a></li>
+      <li><a rel=prefetch class='{segment === "users" ? "selected" : ""}' href='app/users'>users</a></li>
+      <li><a rel=prefetch class='{segment === "hang-types" ? "selected" : ""}' href='app/hang-types'>hang types</a></li>
       <li><span role="button" on:click={handleLogout}>logout</span></li>
     {:else}
-      <li><a rel=prefetch class='{segment === "join" ? "selected" : ""}' href='join'>join</a></li>
-      <li><a rel=prefetch class='{segment === "login" ? "selected" : ""}' href='login'>login</a></li>
+      <li><a rel=prefetch class='{segment === "join" ? "selected" : ""}' href='auth/join'>join</a></li>
+      <li><a rel=prefetch class='{segment === "login" ? "selected" : ""}' href='auth/login'>login</a></li>
     {/if}
   </ul>
 </nav>

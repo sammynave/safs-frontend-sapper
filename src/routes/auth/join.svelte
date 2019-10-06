@@ -1,11 +1,3 @@
-<script context="module">
-  export async function preload(page, session) {
-    if(session.signedIn) {
-      return this.redirect(302, '/');
-    }
-  }
-</script>
-
 <style>
   form {
     max-width: 10em;
@@ -19,26 +11,30 @@
   }
 </style>
 
-{#if saving}
-  <div>saving</div>
-{:else}
-  <form on:submit|preventDefault={submit}>
-    <div>create account</div>
-    <input type="username" bind:value={username} placeholder="username"/>
-    <input type="phone" bind:value={phone} placeholder="phone"/>
-    <input type="email" bind:value={email} placeholder="email"/>
-    <input type="password" bind:value={password} placeholder="password"/>
-    <button type="submit">create</button>
-  </form>
-{/if}
+<main>
+  <h1>create account</h1>
+  <div>
+    {#if saving}
+      <div>saving</div>
+    {:else}
+      <form on:submit|preventDefault={submit}>
+        <input type="username" bind:value={username} placeholder="username"/>
+        <input type="phone" bind:value={phone} placeholder="phone"/>
+        <input type="email" bind:value={email} placeholder="email"/>
+        <input type="password" bind:value={password} placeholder="password"/>
+        <button type="submit">create</button>
+      </form>
+    {/if}
 
-{#each errors as error}
-  <div>{error}</div>
-{/each}
+    {#each errors as error}
+      <div>{error}</div>
+    {/each}
+  </div>
+</main>
 
 <script>
   import { stores, goto } from '@sapper/app';
-  import { signup } from '../api/current-user';
+  import { signup } from '../../api/current-user';
 
   const { session } = stores();
 
