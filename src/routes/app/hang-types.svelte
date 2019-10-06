@@ -64,10 +64,11 @@
   let name = '';
 
   $: console.log($currentUser);
+
   async function createHangType() {
     const body = JSON.stringify({
-      query: `mutation {
-        createNewHangType(input: { name: "${name}" }) {
+      query: `mutation createHang($name: String!){
+        createNewHangType(input: { name: $name }) {
           hangType {
             id,
             name,
@@ -76,7 +77,10 @@
             }
           }
         }
-      }`
+      }`,
+      variables: {
+        name
+      }
     });
 
     const result = await query({ fetch, body });
@@ -88,8 +92,8 @@
 
   async function subscribeTo(hangTypeId) {
     const body = JSON.stringify({
-      query: `mutation {
-        subscribeToHangType(input: { hangTypeId: "${hangTypeId}" }) {
+      query: `mutation subscribeToHang($hangTypeId: String!) {
+        subscribeToHangType(input: { hangTypeId: $hangTypeId }) {
           hangType {
             id,
             name,
@@ -98,7 +102,10 @@
             }
           }
         }
-      }`
+      }`,
+      variables: {
+        hangTypeId
+      }
     });
 
     const result = await query({ fetch, body });
@@ -111,7 +118,20 @@
 
   async function unsubscribeFrom(hangTypeId) {
     const body = JSON.stringify({
-      query: ``
+      query: `mutation unsubscribeFromHang($hangTypeId: String!) {
+        unsubscribeFromHangType(input: { hangTypeId: $hangTypeId }) {
+          hangType {
+            id,
+            name,
+            hangSubscriptions {
+              user { username }
+            }
+          }
+        }
+      }`,
+      variables: {
+        hangTypeId
+      }
     });
 
     const result = await query({ fetch, body });
