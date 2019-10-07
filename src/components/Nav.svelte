@@ -17,36 +17,12 @@
     clear: both;
   }
 
-  li {
-    display: block;
-    float: left;
-  }
-
-  .selected {
-    position: relative;
-    display: inline-block;
-  }
-
-  .selected::after {
-    position: absolute;
-    content: '';
-    width: calc(100% - 1em);
-    height: 2px;
-    background-color: rgb(255,62,0);
-    display: block;
-    bottom: -1px;
-  }
-
-  a, span {
-    text-decoration: none;
-    padding: 1em 0.5em;
-    display: block;
-  }
 </style>
 
 <script>
   import { stores, goto } from '@sapper/app';
   import { logout } from '../api/current-user';
+  import NavLink from './NavLink.svelte';
 
   export let segment;
   const { session } = stores();
@@ -59,14 +35,30 @@
 
 <nav>
   <ul>
-    <li><a rel=prefetch class='{segment === undefined ? "selected" : ""}' href='.'>home</a></li>
+    <NavLink selected={segment === undefined} href='.'>
+      home
+    </NavLink>
+
     {#if $session.signedIn}
-      <li><a rel=prefetch class='{segment === "users" ? "selected" : ""}' href='app/users'>users</a></li>
-      <li><a rel=prefetch class='{segment === "hang-types" ? "selected" : ""}' href='app/hang-types'>hang types</a></li>
-      <li><span role="button" on:click={handleLogout}>logout</span></li>
+      <NavLink selected={segment === "users" ? "selected" : ""} href='app/users'>
+        users
+      </NavLink>
+      <NavLink selected={segment === "hangs" ? "selected" : ""} href='app/hangs'>
+        hangs
+      </NavLink>
+      <NavLink selected={segment === "hang-types" ? "selected" : ""} href='app/hang-types'>
+        hang types
+      </NavLink>
+      <NavLink click={handleLogout}>
+        logout
+      </NavLink>
     {:else}
-      <li><a rel=prefetch class='{segment === "join" ? "selected" : ""}' href='auth/join'>join</a></li>
-      <li><a rel=prefetch class='{segment === "login" ? "selected" : ""}' href='auth/login'>login</a></li>
+      <NavLink selected={segment === "join" ? "selected" : ""} href='auth/join'>
+        join
+      </NavLink>
+      <NavLink selected={segment === "login" ? "selected" : ""} href='auth/login'>
+        login
+      </NavLink>
     {/if}
   </ul>
 </nav>
