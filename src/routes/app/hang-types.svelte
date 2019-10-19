@@ -86,6 +86,7 @@
     hangTypes.update(x => {
       return $hangTypes.concat([hangType])
     });
+    name = '';
   }
 
   async function subscribeTo(hangTypeId) {
