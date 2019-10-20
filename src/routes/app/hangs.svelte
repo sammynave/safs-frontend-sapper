@@ -1,45 +1,16 @@
 <script context="module">
   import { query } from '../../api/graphql';
   import { hangTypes, myHangs, currentUser } from '../../stores';
-
-  const getHangTypes = `
-    query getMyHangs($startBefore: ISO8601DateTime, $startAfter: ISO8601DateTime){
-      me {
-        id,
-        username
-      }
-      myHangs(startBefore: $startBefore, startAfter: $startAfter) {
-        id,
-        startAt,
-        endAt,
-        hangParticipants {
-          id,
-          user { username }
-        }
-        hangType {
-          name,
-          hangSubscriptions {
-            user { username }
-          }
-        }
-      }
-      hangTypes {
-        id,
-        name,
-        hangSubscriptions {
-          user { username }
-        }
-    } }
-  `;
+  import { getMyHangs } from '../../queries/hangs';
 
   const today = new Date();
 
   export async function preload() {
     const body = JSON.stringify({
-    query: getHangTypes,
-    variables: {
-      startAfter: today.toISOString()
-    }
+      query: getMyHangs,
+      variables: {
+        startAfter: today.toISOString()
+      }
     });
     const result = await query({ fetch: this.fetch, body });
     hangTypes.set(result.data.hangTypes);
@@ -53,10 +24,16 @@
   <title>Hangs</title>
 </svelte:head>
 
-<h1>Hangs</h1>
+<h1>My Hangs</h1>
 
-<h1>SHOW ALL HANGS THAT CAN BE PARTICIPATED IN</h1>
-<h1>THEN YES/NO TO CREATE PARTICIPATION RECORD</h1>
+{#if $myHangs}
+  {#each $myHangs as myHang}
+    <div>{myHang.id} {myHang.startAt} {myHang.endAt}</div>
+    {#each myHang.hangType.hangSubscriptions as subs}
+      <div>{subs.user.username}</div>
+    {/each}
+  {/each}
+{/if}
 
 <h2>create a hang</h2>
 
@@ -92,16 +69,6 @@
 
   <button disabled={!selectedId} type="submit">create</button>
 </form>
-
-<h2>my hangs</h2>
-{#if $myHangs}
-  {#each $myHangs as myHang}
-    <div>{myHang.id} {myHang.startAt} {myHang.endAt}</div>
-    {#each myHang.hangType.hangSubscriptions as subs}
-      <div>{subs.user.username}</div>
-    {/each}
-  {/each}
-{/if}
 
 <script>
   export let hangTypes;
@@ -196,7 +163,6 @@
           hang {
             id
           }
-
           myHangs {
             id,
             startAt,

@@ -1,12 +1,19 @@
 import { API_URL } from '../constants';
 import { throwError } from './error-handler';
 
-const cache = {};
+let cache = {};
 
-export const query = async ({ body, fetch }) => {
+export const query = async ({ body, fetch, cacheable = true, bustCache = false }) => {
+  if (bustCache) {
+    cache = {};
+  }
+
   const cached = cache[body];
-  if (cached) {
-    return cached;
+
+  if (cacheable) {
+    if (cached) {
+      return cached;
+    }
   }
 
   const response = await fetch(`${API_URL}/graphql.json`, {
@@ -29,6 +36,10 @@ export const query = async ({ body, fetch }) => {
       errors: [responseBody.error]
     });
   }
-  cache[body] = responseBody;
+
+  if (cacheable) {
+    cache[body] = responseBody;
+  }
+
   return responseBody;
 }

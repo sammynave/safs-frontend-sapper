@@ -19,48 +19,57 @@
 </Title>
 
 {#if $upcomingHangs}
-  {#each $upcomingHangs as hang}
-    <div>{hang.id} {hang.hangType.name} {hang.startAt} {hang.endAt}</div>
-    <button on:click={() => yes(hang)}>yes</button>
-    <button on:click={() => no(hang)}>no</button>
+  {#each orderedUpcomingHangs as hang}
+    <HangItem
+      hang="{hang}"
+      yes="{() => yes(hang)}"
+      no="{() => no(hang)}"
+      username="{$currentUser.username}"/>
   {/each}
 {/if}
 
-
-<div>list hangs of types i'm subscribed to</div>
-
-
 <script>
   import Title from '../../components/Title.svelte';
+  import HangItem from '../../components/HangItem.svelte';
+  import {
+    participateInHang,
+    declineToParticipateInHang
+  } from '../../mutations/hangs';
 
   export let upcomingHangs;
   export let currentUser;
 
+  $: orderedUpcomingHangs = $upcomingHangs.sort((x,y) => new Date(x.startAt) - new Date(y.startAt));
 
   async function yes(hang) {
     const body = JSON.stringify({
-      query: `mutation participateInHang($hangId: String!) {
-        participateInHang(input: { hangId: $hangId }) {
-          hangParticipant {
-            id
-          }
-        }
-      }`,
+      query: participateInHang,
       variables: {
         hangId: hang.id
       }
     });
 
-    const result = await query({ fetch, body });
+    const result = await query({ fetch, body, cacheable: false });
     if (result.errors) {
       errors = result.errors;
       return;
     }
-    console.log(result);
+    upcomingHangs.set(result.data.participateInHang.upcomingHangs);
   }
 
   async function no(hang) {
-    console.log('no');
-    console.log(hang);
+    const body = JSON.stringify({
+      query: declineToParticipateInHang,
+      variables: {
+        hangId: hang.id
+      }
+    });
+
+    const result = await query({ fetch, body, cacheable: false });
+    if (result.errors) {
+      errors = result.errors;
+      return;
+    }
+    upcomingHangs.set(result.data.declineToParticipateInHang.upcomingHangs);
   }
 </script>

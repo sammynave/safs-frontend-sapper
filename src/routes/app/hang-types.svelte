@@ -1,22 +1,7 @@
 <script context="module">
   import { query } from '../../api/graphql';
   import { hangTypes, currentUser } from '../../stores';
-
-  const getHangTypes = `
-    {
-      me {
-        id,
-        username
-      }
-      hangTypes {
-        id,
-        name,
-        hangSubscriptions {
-          user { username }
-        }
-    } }
-  `;
-
+  import { getHangTypes } from '../../queries/hang-types';
 
   export async function preload() {
     const body = JSON.stringify({ query: getHangTypes });
@@ -81,7 +66,7 @@
       }
     });
 
-    const result = await query({ fetch, body });
+    const result = await query({ fetch, body, cacheable: false });
     const { data: { createNewHangType: { hangType } } } = result;
     hangTypes.update(x => {
       return $hangTypes.concat([hangType])
@@ -107,7 +92,7 @@
       }
     });
 
-    const result = await query({ fetch, body });
+    const result = await query({ fetch, body, cacheable: false, bustCache: true });
     const { data: { subscribeToHangType: { hangType } } } = result;
 
     hangTypes.update(x => {
@@ -133,7 +118,7 @@
       }
     });
 
-    const result = await query({ fetch, body });
+    const result = await query({ fetch, body, cacheable: false, bustCache: true });
     const { data: { unsubscribeFromHangType: { hangType } } } = result;
 
     hangTypes.update(x => {
