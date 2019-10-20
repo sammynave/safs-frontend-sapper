@@ -1,27 +1,12 @@
 <script context="module">
   import { query } from '../../api/graphql';
-  import { hangTypes, eligibleHangs, myHangs, currentUser } from '../../stores';
+  import { hangTypes, myHangs, currentUser } from '../../stores';
 
   const getHangTypes = `
     query getMyHangs($startBefore: ISO8601DateTime, $startAfter: ISO8601DateTime){
       me {
         id,
         username
-      }
-      eligibleHangs(startBefore: $startBefore, startAfter: $startAfter) {
-        id,
-        startAt,
-        endAt,
-        hangParticipants {
-          id,
-          user { username }
-        }
-        hangType {
-          name,
-          hangSubscriptions {
-            user { username }
-          }
-        }
       }
       myHangs(startBefore: $startBefore, startAfter: $startAfter) {
         id,
@@ -59,9 +44,8 @@
     const result = await query({ fetch: this.fetch, body });
     hangTypes.set(result.data.hangTypes);
     myHangs.set(result.data.myHangs);
-    eligibleHangs.set(result.data.eligibleHangs);
     currentUser.set(result.data.me);
-    return { hangTypes, eligibleHangs,  myHangs, today, currentUser };
+    return { hangTypes,  myHangs, today, currentUser };
   }
 </script>
 
@@ -73,14 +57,6 @@
 
 <h1>SHOW ALL HANGS THAT CAN BE PARTICIPATED IN</h1>
 <h1>THEN YES/NO TO CREATE PARTICIPATION RECORD</h1>
-
-{#if $eligibleHangs}
-  {#each $eligibleHangs as hang}
-    <div>{hang.id} {hang.hangType.name} {hang.startAt} {hang.endAt}</div>
-    <button on:click={() => yes(hang)}>yes</button>
-    <button on:click={() => no(hang)}>no</button>
-  {/each}
-{/if}
 
 <h2>create a hang</h2>
 
@@ -120,7 +96,7 @@
 <h2>my hangs</h2>
 {#if $myHangs}
   {#each $myHangs as myHang}
-    <div>{myHang.id} {myHang.hangType.name} {myHang.startAt} {myHang.endAt}</div>
+    <div>{myHang.id} {myHang.startAt} {myHang.endAt}</div>
     {#each myHang.hangType.hangSubscriptions as subs}
       <div>{subs.user.username}</div>
     {/each}
@@ -130,7 +106,6 @@
 <script>
   export let hangTypes;
   export let myHangs;
-  export let eligibleHangs;
   export let currentUser;
   export let today;
 
@@ -143,37 +118,6 @@
   let startAtChosen = false;
   let endAtChosen = false;
   let errors = [];
-
-  async function yes(hang) {
-    if (!isValid()) {
-      return;
-    };
-
-    const body = JSON.stringify({
-      query: `mutation participateInHang($hangId: String!) {
-        participateInHang(input: { hangId: $hangId }) {
-          hangParticipant {
-            id
-          }
-        }
-      }`,
-      variables: {
-        hangId: hang.id
-      }
-    });
-
-    const result = await query({ fetch, body });
-    if (result.errors) {
-      errors = result.errors;
-      return;
-    }
-    console.log(result);
-  }
-
-  async function no(hang) {
-    console.log('no');
-    console.log(hang);
-  }
 
   function reset() {
     selectedId;

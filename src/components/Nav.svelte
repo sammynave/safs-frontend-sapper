@@ -40,6 +40,9 @@
     </NavLink>
 
     {#if $session.signedIn}
+      <NavLink selected={segment === "upcoming-hangs" ? "selected" : ""} href='app/upcoming-hangs'>
+        upcoming hangs
+      </NavLink>
       <NavLink selected={segment === "users" ? "selected" : ""} href='app/users'>
         users
       </NavLink>
