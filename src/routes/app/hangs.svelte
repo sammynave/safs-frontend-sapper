@@ -119,7 +119,11 @@
   }
 
   function formatDate(day, time = '00:00') {
-    return `${day}T${time}:00Z`
+    let d = new Date(day);
+    const [hours, mins] = time.split(':');
+    d.setHours(hours);
+    d.setMinutes(mins);
+    return d;
   }
 
   $: if (
@@ -172,12 +176,12 @@
       }`,
       variables: {
         hangTypeId: selectedId,
-        startAt,
-        endAt
+        startAt: startAt.toISOString(),
+        endAt: endAt.toISOString()
       }
     });
 
-    const result = await query({ fetch, body });
+    const result = await query({ fetch, body, cache: false, bustCache: true });
     if (result.errors) {
       errors = result.errors;
       return;
