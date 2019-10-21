@@ -23,3 +23,19 @@ export const hangTypes = `hangTypes {
     user { username }
   }
 }`
+
+export const myHangs = `myHangs {
+  id,
+  startAt,
+  endAt,
+  hangParticipants {
+    id,
+    user { username }
+  }
+  hangType {
+    name,
+    hangSubscriptions {
+      user { username }
+    }
+  }
+}`;

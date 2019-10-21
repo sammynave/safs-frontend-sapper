@@ -7,10 +7,7 @@
 
   export async function preload() {
     const body = JSON.stringify({
-      query: getMyHangs,
-      variables: {
-        startAfter: today.toISOString()
-      }
+      query: getMyHangs
     });
     const result = await query({ fetch: this.fetch, body });
     hangTypes.set(result.data.hangTypes);
@@ -27,8 +24,9 @@
 <h1>My Hangs</h1>
 
 {#if $myHangs}
-  {#each $myHangs as myHang}
+  {#each orderedMyHangs as myHang}
     <div>{myHang.id} {myHang.startAt} {myHang.endAt}</div>
+    {JSON.stringify(myHang)}
     {#each myHang.hangType.hangSubscriptions as subs}
       <div>{subs.user.username}</div>
     {/each}
@@ -71,6 +69,8 @@
 </form>
 
 <script>
+  import { myHangs as myHangsFrag } from '../../queries/fragments';
+
   export let hangTypes;
   export let myHangs;
   export let currentUser;
@@ -136,6 +136,7 @@
   $: startAt, endAt, selectedId, errors = [];
   $: startAt = formatDate(startAtDay, startAtTime);
   $: endAt = formatDate(endAtDay, endAtTime);
+  $: orderedMyHangs = $myHangs.sort((x, y) => new Date(y.startAt) - new Date(x.startAt));
 
   function isValid() {
     let endsAfterStart = false;
@@ -162,16 +163,13 @@
     };
 
     const body = JSON.stringify({
-      query: `mutation createHang($hangTypeId: String!, $startAt: ISO8601DateTime!, $endAt: ISO8601DateTime!){
+      query: `mutation createHang(
+        $hangTypeId: String!,
+        $startAt: ISO8601DateTime!,
+        $endAt: ISO8601DateTime!) {
         createHang(input: { hangTypeId: $hangTypeId, startAt: $startAt, endAt: $endAt}) {
-          hang {
-            id
-          }
-          myHangs {
-            id,
-            startAt,
-            endAt
-          }
+          hang { id }
+          ${myHangsFrag}
         }
       }`,
       variables: {
